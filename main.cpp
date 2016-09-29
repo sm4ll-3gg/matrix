@@ -19,6 +19,8 @@ int main()
 
     m1->fill();
 
+    m1->sort();
+
     try
     {
         std::cout << "\nВывод матрицы m1:" << std::endl;

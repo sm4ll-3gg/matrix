@@ -8,12 +8,16 @@
 template<typename T>
 class Matrix
 {
+public:
     T** matrix;
     size_t _lines;
     size_t _columns;
 
-    T calculate_det(T**, size_t);
-    T** cut(T**, size_t, size_t) throw(MException);
+    T                       calculate_det(T**, size_t);
+    T**                     cut(T**, size_t, size_t) throw(MException);
+
+    void                    qsort(T*, int, int);
+    T                       partition(T*, int, int);
 public:
     explicit Matrix(size_t = 0, size_t = 0) throw(MException);
     Matrix(const Matrix&) throw(MException);
@@ -26,6 +30,8 @@ public:
     size_t                  columns();
 
     void                    resize(size_t,size_t) throw(MException);
+
+    void                    sort();
 
     T&                      at(const size_t, const size_t) throw(MException);
 
@@ -56,10 +62,10 @@ T** Matrix<T>::cut(T ** m, size_t size, size_t c) throw(MException) // с - ст
 {
     try
     {
-        T** Cut=new T*[size-1];
+        T** cut_m=new T*[size-1];
         for(size_t i = 0; i < size-1; i++)
         {
-            Cut[i] = new T[size-1];
+            cut_m[i] = new T[size-1];
         }
 
         for(size_t i = 1; i < size; i++)
@@ -68,7 +74,7 @@ T** Matrix<T>::cut(T ** m, size_t size, size_t c) throw(MException) // с - ст
             {
                 if(j != c)
                 {
-                    Cut[i-1][t] = m[i][j];
+                    cut_m[i-1][t] = m[i][j];
                 }
                 else
                 {
@@ -77,7 +83,7 @@ T** Matrix<T>::cut(T ** m, size_t size, size_t c) throw(MException) // с - ст
             }
         }
 
-        return Cut;
+        return cut_m;
     }
     catch(std::bad_alloc)
     {
@@ -102,8 +108,51 @@ T Matrix<T>::calculate_det(T** m, size_t size)
                 result += pow(-1,i+2)*m[0][i]*calculate_det(cut(m,size,i),size-1);
             }
         }
+
+        for(size_t i = 0; i < size; i++)
+        {
+            delete[] m;
+        }
+        m = nullptr;
+
         return result;
     }
+}
+
+template<typename T>
+void Matrix<T>::qsort(T* m,int begin, int end)
+{
+    if(begin < end)
+    {
+        int q = partition(m,begin,end);
+        qsort(m,begin,q-1);
+        qsort(m,q+1,end);
+    }
+}
+
+template<typename T>
+T Matrix<T>::partition(T* m,int begin, int end)
+{
+    T sup = m[end];
+    int i = begin - 1;
+
+    for(int j = begin; j < end; j++)
+    {
+        if(m[j] <= sup)
+        {
+            i++;
+
+            T x = m[i];
+            m[i] = m[j];
+            m[j] = x;
+        }
+    }
+
+    T x = m[i+1];
+    m[i+1] = m[end];
+    m[end] = x;
+
+    return i+1;
 }
 
 template<typename T>
@@ -236,6 +285,14 @@ void Matrix<T>::resize(size_t l, size_t c) throw(MException)
             }
         }
 
+        if(matrix != nullptr)
+        {
+            for(size_t i = 0; i < _lines; i++)
+            {
+                delete[] matrix[i];
+            }
+        }
+
         matrix = temp_m; // По идее, если bad alloc, то их надо оставить прежними
         _lines = l;  // пока не придумал как
         _columns = c;
@@ -246,6 +303,34 @@ void Matrix<T>::resize(size_t l, size_t c) throw(MException)
     {
         throw MException("Bad alloc");
     }
+}
+
+template<typename T>
+void Matrix<T>::sort()
+{
+    size_t temp_size = _lines*_columns;
+    T* temp_m = new T[temp_size];
+
+    for(size_t i = 0; i < _lines; i++)
+    {
+        for(size_t j = 0; j < _columns; j++)
+        {
+            temp_m[i*_columns + j] = matrix[i][j];
+        }
+    }
+
+    qsort(temp_m,0,temp_size - 1);
+
+    for(size_t i = 0; i < _lines; i++)
+    {
+        for(size_t j = 0; j < _columns; j++)
+        {
+            matrix[i][j] = temp_m[i*_columns + j];
+        }
+    }
+
+    delete[] temp_m;
+    temp_m = nullptr;
 }
 
 template<typename T>
