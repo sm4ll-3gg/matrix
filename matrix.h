@@ -39,7 +39,7 @@ public:
     void                    clear() throw(MException);
 
     void                    transposition() noexcept;
-    T                       determinant() throw(MException);
+    const T                 determinant() throw(MException);
 
     Matrix<T>               operator + (const Matrix<T>&) throw(MException);
     Matrix<T>               operator - (const Matrix<T>&) throw(MException);
@@ -99,7 +99,7 @@ T Matrix<T>::calculate_det(T** m, size_t size) noexcept
     }
     else
     {
-        int result = 0;
+        T result = T();
         for(size_t i = 0; i < size; i++)
         {
             if(m[0][i] != 0)
@@ -350,7 +350,7 @@ void Matrix<T>::transposition() noexcept
 }
 
 template<typename T>
-T Matrix<T>::determinant() throw(MException)
+const T Matrix<T>::determinant() throw(MException)
 {
     if(_lines != _columns)
     {
