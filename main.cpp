@@ -8,7 +8,7 @@ int main()
 
     try
     {
-        m = new Matrix<int>;
+        m = new Matrix<int>(2,2);
         m1 = new Matrix<int>(2,2);
     }
     catch(MException& ex)
@@ -19,7 +19,7 @@ int main()
 
     m1->fill();
 
-    m1->sort();
+    std::cout << "Оператор << для m1:\n" << *m1 << std::endl;
 
     try
     {
@@ -34,7 +34,7 @@ int main()
                   << ex.get_name() << std::endl;
     }
 
-    std::cout << "\nМатрица m имеет " << m->lines() << " строк и " << m->columns() << "столбцов" <<std::endl;
+    std::cout << "\nМатрица m имеет " << m->lines() << " строк и " << m->columns() << " столбцов" <<std::endl;
     try
     {
         std::cout << "Изменение размера матрицы m:" << std::endl;
@@ -74,8 +74,6 @@ int main()
 
     m->transposition();
     std::cout << "Транспонированная матрица m :\n" << *m << std::endl;
-
-    std::cout << "m[0][0] = " << (*m)[0][0] << std::endl;
 
     try
     {
